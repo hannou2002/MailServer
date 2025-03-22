@@ -1,4 +1,4 @@
-package org.example.mailserver.smtp;
+package org1.example.mailserver.smtp;
 import org.example.mailserver.smtp.SMTPServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
