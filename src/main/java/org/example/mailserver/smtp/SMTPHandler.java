@@ -9,7 +9,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+// Add these imports at the top
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import org.example.mailserver.auth.AuthService;
 public class SMTPHandler extends Thread {
     private Socket socket;
     private BufferedReader in;
@@ -227,7 +230,7 @@ public class SMTPHandler extends Thread {
         }
         return email;
     }
-
+    /*
     private boolean isValidSender(String sender) {
         // Extrait le username de l'adresse email
         String username = sender.split("@")[0];
@@ -235,7 +238,25 @@ public class SMTPHandler extends Thread {
         Path senderDir = Paths.get("mailserver/" + username);
         return Files.exists(senderDir);
     }
+    */
+    // Modify the isValidSender and isValidRecipient methods
+    private boolean isValidSender(String sender) {
+        try {
+            // Extract username from email
+            String username = sender.split("@")[0];
 
+            // Get RMI registry
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+            AuthService authService = (AuthService) registry.lookup("AuthService");
+
+            // Check if user exists via RMI
+            return authService.userExists(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    /*
     private boolean isValidRecipient(String recipient) {
         // Extrait le username de l'adresse email
         String username = recipient.split("@")[0];
@@ -243,7 +264,23 @@ public class SMTPHandler extends Thread {
         Path recipientDir = Paths.get("mailserver/" + username);
         return Files.exists(recipientDir);
     }
+    */
+    private boolean isValidRecipient(String recipient) {
+        try {
+            // Extract username from email
+            String username = recipient.split("@")[0];
 
+            // Get RMI registry
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+            AuthService authService = (AuthService) registry.lookup("AuthService");
+
+            // Check if user exists via RMI
+            return authService.userExists(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     private void storeEmail() {
         try {
             // Pour chaque destinataire valide, stocke l'email dans son dossier

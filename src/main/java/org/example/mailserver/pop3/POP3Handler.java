@@ -7,7 +7,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
+// Add these imports at the top
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import org.example.mailserver.auth.AuthService;
 public class POP3Handler extends Thread {
     private Socket socket;
     private BufferedReader in;
@@ -107,7 +110,7 @@ public class POP3Handler extends Thread {
                 break;
         }
     }
-
+    /*
     private boolean isValidUser(String email) {
         // Vérifier si l'email est au format user1@domain.com
         if (!email.matches("[^@]+@[^@]+")) {
@@ -134,7 +137,26 @@ public class POP3Handler extends Thread {
         }
         return true;
     }
+    */
+    // Modify the isValidUser and isValidPassword methods
+    private boolean isValidUser(String email) {
+        try {
+            // Get RMI registry
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+            AuthService authService = (AuthService) registry.lookup("AuthService");
 
+            // Extract username from email
+            String username = extractUsernameFromEmail(email);
+            if (username == null) return false;
+
+            // Check if user exists via RMI
+            return authService.userExists(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    /*
     private boolean isValidPassword(String email, String password) {
         // Extraire le username de l'adresse email
         String username = extractUsernameFromEmail(email);
@@ -156,7 +178,25 @@ public class POP3Handler extends Thread {
         }
         return false;
     }
+    */
 
+    private boolean isValidPassword(String email, String password) {
+        try {
+            // Get RMI registry
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+            AuthService authService = (AuthService) registry.lookup("AuthService");
+
+            // Extract username from email
+            String username = extractUsernameFromEmail(email);
+            if (username == null) return false;
+
+            // Authenticate via RMI
+            return authService.authenticate(username, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     private String extractUsernameFromEmail(String email) {
         // Vérifier si l'email est au format user1@domain.com
         if (!email.matches("[^@]+@[^@]+")) {
