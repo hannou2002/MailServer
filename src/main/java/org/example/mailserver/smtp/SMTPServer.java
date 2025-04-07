@@ -3,6 +3,12 @@ package org.example.mailserver.smtp;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.io.*;
+import java.net.Socket;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import org.example.mailserver.database.DatabaseConnection;
 //RCPT TO:
 public class SMTPServer {
     private static final int PORT = 25;

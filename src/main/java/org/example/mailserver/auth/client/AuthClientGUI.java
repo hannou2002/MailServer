@@ -2,7 +2,6 @@ package org.example.mailserver.auth.client;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import org.example.mailserver.auth.AuthService;
@@ -16,7 +15,8 @@ public class AuthClientGUI extends JFrame {
             authService = (AuthService) registry.lookup("AuthService");
             initializeUI();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error connecting to AuthService: " + e.getMessage(),
+            JOptionPane.showMessageDialog(this,
+                    "Error connecting to AuthService: " + e.getMessage(),
                     "Connection Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
             System.exit(1);
@@ -24,15 +24,12 @@ public class AuthClientGUI extends JFrame {
     }
 
     private void initializeUI() {
-        setTitle("User Account Manager");
-        setSize(400, 300);
+        setTitle("User Account Manager (RMI)");
+        setSize(500, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Create tabbed pane
         JTabbedPane tabbedPane = new JTabbedPane();
-
-        // Add tabs
         tabbedPane.addTab("Create Account", createCreateAccountPanel());
         tabbedPane.addTab("Update Account", createUpdateAccountPanel());
         tabbedPane.addTab("Delete Account", createDeleteAccountPanel());
@@ -41,7 +38,8 @@ public class AuthClientGUI extends JFrame {
     }
 
     private JPanel createCreateAccountPanel() {
-        JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
+        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel userLabel = new JLabel("Username:");
         JTextField userField = new JTextField();
@@ -54,24 +52,21 @@ public class AuthClientGUI extends JFrame {
             String password = new String(passField.getPassword());
 
             if (username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Username and password cannot be empty",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                showError("Username and password cannot be empty");
                 return;
             }
 
             try {
                 boolean success = authService.createAccount(username, password);
                 if (success) {
-                    JOptionPane.showMessageDialog(this, "Account created successfully");
+                    showSuccess("Account created successfully!");
                     userField.setText("");
                     passField.setText("");
                 } else {
-                    JOptionPane.showMessageDialog(this, "Account already exists",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    showError("Account already exists");
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error creating account: " + ex.getMessage(),
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                showError("Error creating account: " + ex.getMessage());
                 ex.printStackTrace();
             }
         });
@@ -80,14 +75,15 @@ public class AuthClientGUI extends JFrame {
         panel.add(userField);
         panel.add(passLabel);
         panel.add(passField);
-        panel.add(new JLabel()); // Empty cell
+        panel.add(new JLabel());
         panel.add(createButton);
 
         return panel;
     }
 
     private JPanel createUpdateAccountPanel() {
-        JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
+        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel userLabel = new JLabel("Username:");
         JTextField userField = new JTextField();
@@ -100,24 +96,21 @@ public class AuthClientGUI extends JFrame {
             String password = new String(passField.getPassword());
 
             if (username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Username and password cannot be empty",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                showError("Username and password cannot be empty");
                 return;
             }
 
             try {
                 boolean success = authService.updateAccount(username, password);
                 if (success) {
-                    JOptionPane.showMessageDialog(this, "Account updated successfully");
+                    showSuccess("Account updated successfully!");
                     userField.setText("");
                     passField.setText("");
                 } else {
-                    JOptionPane.showMessageDialog(this, "Account does not exist",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    showError("Account does not exist");
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error updating account: " + ex.getMessage(),
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                showError("Error updating account: " + ex.getMessage());
                 ex.printStackTrace();
             }
         });
@@ -126,14 +119,15 @@ public class AuthClientGUI extends JFrame {
         panel.add(userField);
         panel.add(passLabel);
         panel.add(passField);
-        panel.add(new JLabel()); // Empty cell
+        panel.add(new JLabel());
         panel.add(updateButton);
 
         return panel;
     }
 
     private JPanel createDeleteAccountPanel() {
-        JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
+        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel userLabel = new JLabel("Username:");
         JTextField userField = new JTextField();
@@ -143,8 +137,7 @@ public class AuthClientGUI extends JFrame {
             String username = userField.getText().trim();
 
             if (username.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Username cannot be empty",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                showError("Username cannot be empty");
                 return;
             }
 
@@ -156,15 +149,13 @@ public class AuthClientGUI extends JFrame {
                 try {
                     boolean success = authService.deleteAccount(username);
                     if (success) {
-                        JOptionPane.showMessageDialog(this, "Account deleted successfully");
+                        showSuccess("Account deleted successfully!");
                         userField.setText("");
                     } else {
-                        JOptionPane.showMessageDialog(this, "Account does not exist",
-                                "Error", JOptionPane.ERROR_MESSAGE);
+                        showError("Account does not exist");
                     }
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "Error deleting account: " + ex.getMessage(),
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    showError("Error deleting account: " + ex.getMessage());
                     ex.printStackTrace();
                 }
             }
@@ -172,10 +163,18 @@ public class AuthClientGUI extends JFrame {
 
         panel.add(userLabel);
         panel.add(userField);
-        panel.add(new JLabel()); // Empty cell
+        panel.add(new JLabel());
         panel.add(deleteButton);
 
         return panel;
+    }
+
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void showSuccess(String message) {
+        JOptionPane.showMessageDialog(this, message, "Success", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public static void main(String[] args) {
