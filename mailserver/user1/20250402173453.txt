@@ -1,3 +1,0 @@
-From: user2@gmail.com
-To: user1@gmail.com
-hello from user2 to user1
